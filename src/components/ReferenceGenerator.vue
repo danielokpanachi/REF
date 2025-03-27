@@ -117,9 +117,17 @@
   
       <!-- Display Generated Reference if exists -->
       <div class="generated-result" v-if="referenceNumber">
-        <h4>Generated Reference</h4>
-        <p>{{ referenceNumber }}</p>
-      </div>
+  <h4>Generated Reference</h4>
+  <div v-if="!isEditing">
+    <p>{{ referenceNumber }}</p>
+    <button @click="editReference" class="edit-btn">Edit</button>
+  </div>
+  <div v-else>
+    <input v-model="editedReference" class="edit-input"/>
+    <button @click="updateReference" class="update-btn">Update</button>
+    <button @click="cancelEdit" class="cancel-btn">Cancel</button>
+  </div>
+</div>
     </div>
   </div>
 </template>
@@ -141,6 +149,8 @@ export default {
       organizationCategory: '',
       orgCode: '',
       referenceNumber: '',
+      isEditing: false,
+      editedReference: '',
       testOrganizations: Array.from({ length: 20 }, (_, i) => `Test Org ${i + 1}`),
       organizations: ["Org A", "Org B", "Org C", "Org D"],
       showAddPopup: false,
@@ -181,8 +191,11 @@ export default {
         senderDepartment: this.senderDepartment,
         organizationCategory: this.organizationCategory,
         orgCode: this.orgCode
+
       };
+   
   
+
       // Find the organization from the store
       const org = store.testOrganizations.find(
         (o) => o.name.toLowerCase() === this.orgName.toLowerCase()
@@ -194,6 +207,7 @@ export default {
         org.references = [...org.references];
         // Optionally, update a local property to display the generated reference
         this.referenceNumber = newReference.referenceNumber;
+        this.referenceIndex = org.references.length - 1;
       } else {
         alert('Organization not found in Test Organizations');
       }
@@ -227,8 +241,39 @@ export default {
     viewOrganization(org) {
       // Navigate to the view page using Vue Router
       this.$router.push({ name: 'ViewOrganization', params: { orgName: org } });
-    }
+    },
+    
+
+
+    // ... existing methods such as generateReference, etc.
+    editReference() {
+      // Set the editedReference value to the current referenceNumber and enable edit mode
+      this.editedReference = this.referenceNumber;
+      this.isEditing = true;
+    },
+    updateReference() {
+      // Update local referenceNumber
+      this.referenceNumber = this.editedReference;
+      // Update the corresponding reference in the store
+      const org = store.testOrganizations.find(
+        (o) => o.name.toLowerCase() === this.orgName.toLowerCase()
+      );
+      if (org && this.referenceIndex !== null) {
+        org.references[this.referenceIndex].referenceNumber = this.editedReference;
+        // Force reactivity update
+        org.references = [...org.references];
+      }
+      // Update the referenceNumber with the edited value and disable edit mode
+      this.referenceNumber = this.editedReference;
+      this.isEditing = false;
+    },
+    cancelEdit() {
+      // Cancel editing and revert to display mode without changes
+      this.isEditing = false;
+    
   }
+  }
+
 };
 </script>
   
