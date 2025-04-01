@@ -166,29 +166,30 @@ export default {
     clearSearch() {
       this.sidebarSearch = '';
     },
-    generateReference() {
-      if (!this.orgName || !this.date) {
-        alert('Please fill all fields');
-        return;
-      }
-      const formattedDate = this.date.replace(/-/g, '');
-      const newReference = {
-        referenceNumber: `DBN/${this.orgName.replace(/\s+/g, '').toUpperCase()}/${formattedDate}/${this.orgCode}`,
-        date: this.date,
-        subject: this.subject,
-        recipientTitle: this.recipientTitle,
-        recipientName: this.recipientName,
-        senderDepartment: this.senderDepartment,
-        organizationCategory: this.organizationCategory,
-        orgCode: this.orgCode
 
-      };
-   
-  
+    
+    generateReference() {
+  if (!this.recipientTitle || !this.subject || !this.recipientName || !this.senderDepartment || !this.date) {
+    alert('Please fill in all required fields.');
+    return;
+  }
+
+  const formattedDate = this.date.replace(/-/g, '');
+  const newReference = {
+    referenceNumber: `DBN/${formattedDate}/${Math.floor(1000 + Math.random() * 9000)}`,
+    date: this.date,
+    subject: this.subject,
+    recipientTitle: this.recipientTitle,
+    recipientName: this.recipientName,
+    senderDepartment: this.senderDepartment,
+  };
+
+  //  FIX: Use firstMatchingOrg instead of this.orgName
+  const selectedOrgName = this.firstMatchingOrg; 
 
       // Find the organization from the store
       const org = store.testOrganizations.find(
-        (o) => o.name.toLowerCase() === this.orgName.toLowerCase()
+        (o) => o.name.toLowerCase() === selectedOrgName.toLowerCase()
       );
       if (org) {
         // Push the new reference entry into the organization's references array
@@ -198,9 +199,29 @@ export default {
         // Optionally, update a local property to display the generated reference
         this.referenceNumber = newReference.referenceNumber;
         this.referenceIndex = org.references.length - 1;
-      } else {
+
+        alert(`Reference Number Generated - ${this.referenceNumber}`);
+      } 
+      else {
         alert('Organization not found in Test Organizations');
       }
+      if (org) {
+    // Check if an exact reference already exists
+    const duplicateReference = org.references.some(ref => 
+      ref.date === newReference.date &&
+      ref.subject.toLowerCase() === newReference.subject.toLowerCase() &&
+      ref.recipientTitle.toLowerCase() === newReference.recipientTitle.toLowerCase() &&
+      ref.recipientName.toLowerCase() === newReference.recipientName.toLowerCase() &&
+      ref.senderDepartment.toLowerCase() === newReference.senderDepartment.toLowerCase()
+    );
+
+    if (duplicateReference) {
+      alert('Reference code already generated');
+      return;
+    }
+  }
+
+
     },
     goToTestOrganizations() {
       this.$router.push({ name: 'TestOrganizations' });
@@ -262,6 +283,16 @@ addNewOrganization() {
         alert('Please fill all fields before adding the organization.');
         return;
       }
+
+// Check if organization already exists
+const orgExists = store.testOrganizations.some(org => 
+    org.name.toLowerCase() === this.newOrgName.toLowerCase()
+  );
+
+  if (orgExists) {
+    alert('Organization already added');
+    return;
+  }
 
       // Create new organization object
       const newOrg = {
@@ -364,7 +395,7 @@ body, html {
   z-index: 1000;
 }
 .popup-container {
-  background: #fff;
+  background: #ffffff;
   padding: 20px;
   border-radius: 10px;
   width: 90%;
@@ -384,9 +415,18 @@ body, html {
   border-radius: 5px;
   padding: 10px;
   list-style: none;
-  margin-top: 5px;
+  margin-top: 15px;
 }
-
+.organization-list-container {
+  width: 170%;
+  max-height: 200px;
+  overflow-y: auto;
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 10px;
+  margin-top: 60px; /* Adds space between the search bar and the list */
+}
 
 .organization-list li {
   display: flex;
@@ -473,7 +513,7 @@ body, html {
   border-radius: 5px;
 }
 button {
-  background-color: #007bff;
+  background-color: #1787ff;
   color: white;
   border: none;
   padding: 10px 15px;
@@ -483,5 +523,23 @@ button {
 }
 button:hover {
   background-color: #0056b3;
+}
+
+.add-btn {
+  padding: 9px 16px;
+  background-color: blue;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s;
+  float: right; /* Move the button to the right of the input */
+  margin-left: 10px; /* Add some space between the input and the button */
+  margin-top: 6px; /* Adds space between the search bar and the list */
+
+}
+
+.add-btn:hover {
+  background-color: rgb(255, 25, 0);
 }
 </style>
