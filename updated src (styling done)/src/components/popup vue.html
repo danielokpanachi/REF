@@ -1,0 +1,63 @@
+<template>
+  <div class="container">
+    <div>
+      <h2 class="title">Reference Number Generator</h2>
+      <div class="content">
+        <!-- Left Sidebar: Only search & Add button are always visible -->
+        <div class="left-sidebar translucent-panel">
+          <div class="left-sidebar">
+            <h3>Search Organisation / add organizations</h3>
+            <input
+              v-model="sidebarSearch"
+              type="text"
+              placeholder="Search organization"
+              class="sidebar-search-input"
+            />
+            <button @click="addOrganization" class="add-btn">Add</button>
+          </div>
+        </div>
+
+        <!-- Popup Overlay: Only appears when add button is clicked -->
+        <div v-if="showAddPopup" class="popup-overlay">
+          <div class="popup-container">
+            <h2>Reference Number Generator</h2>
+            <div class="input-group">
+              <label>Name of Organization</label>
+              <input v-model="orgName" type="text" placeholder="Enter organization name" />
+            </div>
+            <div class="input-group">
+              <label>Organization Category</label>
+              <select v-model="organizationCategory">
+                <option>Regulatory Agency</option>
+                <option>PFI</option>
+                <option>Govt/state Government Agency</option>
+                <option>Govt/Federal Government Agency</option>
+                <option>Embassy/Consular office</option>
+                <option>Development partner</option>
+                <option>Regulatory Agency</option>
+                <option>Individual</option>
+                <option>Vendor/service provider</option>
+                <option>Others</option>
+              </select>
+            </div>
+            <div class="input-group">
+              <label>Organization Code</label>
+              <input v-model="orgCode" type="text" placeholder="Enter organization code" />
+            </div>
+            <button @click="generateReference" class="generate-btn">Generate Reference</button>
+            <div v-if="referenceNumber" class="generated-result">
+              <h4>Generated Reference</h4>
+              <p>{{ referenceNumber }}</p>
+            </div>
+            <button @click="cancelAddPopup" class="close-btn">Close</button>
+          </div>
+        </div>
+
+        <!-- Main Content remains unchanged -->
+        <div class="main-content translucent-panel">
+          <!-- ... other form elements ... -->
+        </div>
+      </div>
+    </div>
+  </div>
+</template>

@@ -1,0 +1,50 @@
+generateReference() {
+  if (!this.recipientTitle || !this.subject || !this.recipientName || !this.senderDepartment || !this.date) {
+    alert('Please fill in all required fields.');
+    return;
+  }
+
+  const formattedDate = this.date.replace(/-/g, '');
+  const selectedOrgName = this.firstMatchingOrg; // Ensure selected org is correct
+
+  const org = store.testOrganizations.find(
+    (o) => o.name.toLowerCase() === selectedOrgName.toLowerCase()
+  );
+
+  if (!org) {
+    alert('Organization not found in Test Organizations');
+    return;
+  }
+
+  // 🔹 Check if an exact reference already exists BEFORE adding it
+  const duplicateReference = org.references.some(ref =>
+    ref.date === this.date &&
+    ref.subject.toLowerCase() === this.subject.toLowerCase() &&
+    ref.recipientTitle.toLowerCase() === this.recipientTitle.toLowerCase() &&
+    ref.recipientName.toLowerCase() === this.recipientName.toLowerCase() &&
+    ref.senderDepartment.toLowerCase() === this.senderDepartment.toLowerCase()
+  );
+
+  if (duplicateReference) {
+    alert('Reference code already generated');
+    return;
+  }
+
+  // If not a duplicate, generate the reference number and add it
+  const newReference = {
+    referenceNumber: `DBN/${formattedDate}/${Math.floor(1000 + Math.random() * 9000)}`,
+    date: this.date,
+    subject: this.subject,
+    recipientTitle: this.recipientTitle,
+    recipientName: this.recipientName,
+    senderDepartment: this.senderDepartment,
+  };
+
+  org.references.push(newReference);
+  org.references = [...org.references]; // Force reactivity update
+
+  this.referenceNumber = newReference.referenceNumber;
+  this.referenceIndex = org.references.length - 1;
+
+  alert(`Reference Number Generated - ${this.referenceNumber}`);
+}
