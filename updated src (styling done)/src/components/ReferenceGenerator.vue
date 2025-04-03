@@ -58,9 +58,9 @@
                   <option>Company Secretariat(legal)</option>
                   <option>Corporate Services</option>
                   <option>Corporate Services(IT)</option>
-                  <option>Finance - Finance and Accounts</option>
-                  <option>Finance - Budget and Performance Mgt</option>
-                  <option>Finance - Treasury and Investments</option>
+                  <option>Finance(Finance and Accounts)</option>
+                  <option>Finance(Budget and Performance Mgt)</option>
+                  <option>Finance(Treasury and Investments)</option>
                   <option>Human resources</option>
                   <option>Internal Audit</option>
                   <option>Office of the MD</option>
